@@ -1,0 +1,25 @@
+{
+    "name": "swissdidata/ocrplugin",
+    "description": "OCR — extract text from uploaded PDFs and images using Tesseract, for DiData",
+    "require": {
+        "didata/installer": "@dev",
+        "thiagoalessio/tesseract_ocr": "^2.13"
+    },
+    "autoload": {
+        "psr-4": {
+            "SwissDidata\\Ocr\\": "src"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "SwissDidata\\Ocr\\OcrPackage"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
