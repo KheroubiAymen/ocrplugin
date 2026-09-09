@@ -26,9 +26,9 @@ Response:
 { "file": "scan.pdf", "text": "..." }
 ```
 
-PDF files are rasterized page by page via Imagick (requires the `imagick` PHP extension + Ghostscript) before OCR, since Tesseract only reads raster images. Pages are joined with `--- page break ---`.
+For PDFs: if the `imagick` PHP extension is installed, each page is rasterized (via Ghostscript) then OCR'd, with pages joined by `--- page break ---`. If Imagick isn't installed, the PDF is handed directly to the `tesseract` binary instead — this works if the server's Tesseract build has PDF support built in (via leptonica), with no extra dependency. If neither works, the route returns a clear error explaining what's missing.
 
 ## Requirements
 
 - `tesseract-ocr` binary installed on the server, with the language packs used in `lang`
-- PHP `imagick` extension + Ghostscript, for PDF input
+- For PDFs: either the PHP `imagick` extension + Ghostscript, or a Tesseract build with built-in PDF support
