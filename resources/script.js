@@ -36,7 +36,7 @@
         formData.append('file', this.selectedFile);
         formData.append('lang', this.languages || 'eng,fra');
 
-        const url = await this.getRouteURLByName('ocr_extract_text');
+        const url = this.getUserRouteURLByName('ocr_extract_text');
         const response = await this.dapp.$axios.$post(url, formData);
 
         if (response && response.error) {
