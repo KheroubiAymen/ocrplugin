@@ -3,7 +3,7 @@
     return {
       selectedFile: null,
       dragActive: false,
-      languages: 'eng,fra',
+      languages: '',
       loading: false,
       error: null,
       resultText: '',
@@ -51,7 +51,7 @@
       try {
         const formData = new FormData();
         formData.append('file', this.selectedFile);
-        formData.append('lang', this.languages || 'eng,fra');
+        if (this.languages) formData.append('lang', this.languages);
 
         const url = await this.getRouteURLByName('ocr_extract_text');
         const response = await this.dapp.$axios.$post(url, formData);

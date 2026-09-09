@@ -1,13 +1,14 @@
 # OCR plugin for DiData
 
-Extracts text from an uploaded PDF or image using Tesseract OCR (must already be installed on the server: `tesseract-ocr` binary + language data, e.g. `tesseract-ocr-fra`).
+Extracts text from an uploaded PDF or image using OpenAI's vision-capable models, called over HTTPS — no Tesseract, Imagick, or Ghostscript required on the server.
 
 ## Install
 
 ```
-composer require thiagoalessio/tesseract_ocr
 composer require swissdidata/ocrplugin
 ```
+
+Set `OPENAI_API_KEY` in the server's `.env` (same variable DiData's own `Domain\Ai` package uses — if your instance already has AI features configured, it's likely already set). Optionally set `OPENAI_OCR_MODEL` to override the default (`gpt-4o`).
 
 The migration seeds a DiData **User Route**: `POST /api/user-routes-call/ocr_extract_text`.
 
@@ -18,7 +19,7 @@ The package also registers an **OCR module** (`resources/template.xml` + `resour
 Send `multipart/form-data`:
 
 - `file` — the PDF or image to OCR
-- `lang` — optional, comma-separated Tesseract language codes (default `eng,fra`)
+- `lang` — optional free-text hint about the document's language(s), passed into the prompt (e.g. `French, English`)
 
 Response:
 
@@ -26,9 +27,7 @@ Response:
 { "file": "scan.pdf", "text": "..." }
 ```
 
-For PDFs: if the `imagick` PHP extension is installed, each page is rasterized (via Ghostscript) then OCR'd, with pages joined by `--- page break ---`. If Imagick isn't installed, the PDF is handed directly to the `tesseract` binary instead — this works if the server's Tesseract build has PDF support built in (via leptonica), with no extra dependency. If neither works, the route returns a clear error explaining what's missing.
-
 ## Requirements
 
-- `tesseract-ocr` binary installed on the server, with the language packs used in `lang`
-- For PDFs: either the PHP `imagick` extension + Ghostscript, or a Tesseract build with built-in PDF support
+- `OPENAI_API_KEY` set in `.env`, with access to a vision-capable model (default `gpt-4o`)
+- Outbound HTTPS access from the server to `api.openai.com`

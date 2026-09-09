@@ -25,8 +25,8 @@
 
   <div class="ocr-controls">
     <label class="ocr-lang-label">
-      Languages
-      <input v-model="languages" type="text" class="ocr-lang-input" placeholder="eng,fra" />
+      Language hint (optional)
+      <input v-model="languages" type="text" class="ocr-lang-input" placeholder="French, English" />
     </label>
     <button class="ocr-extract-btn" :disabled="!selectedFile || loading" @click="extractText">
       {{ loading ? 'Extracting…' : 'Extract text' }}

@@ -27,16 +27,14 @@ if (!$uploaded) {
 
 \Log::info('[OCR] Extracting text from uploaded file: ' . $uploaded->getClientOriginalName());
 
-$extension = strtolower($uploaded->getClientOriginalExtension());
-$path      = $uploaded->getRealPath();
-$languages = array_filter(explode(',', request()->input('lang', 'eng,fra')));
+$languageHint = trim((string) request()->input('lang', ''));
 
 try {
-    if ($extension === 'pdf') {
-        $text = (new SwissDidata\Ocr\PdfOcrConverter())->extractText($path, $languages);
-    } else {
-        $text = (new thiagoalessio\TesseractOCR\TesseractOCR($path))->lang(...$languages)->run();
-    }
+    $text = (new SwissDidata\Ocr\OpenAiOcrService())->extractText(
+        $uploaded->getRealPath(),
+        $uploaded->getMimeType(),
+        $languageHint ?: null
+    );
 
     $this->response->setResponseContent(json_encode([
         'file' => $uploaded->getClientOriginalName(),

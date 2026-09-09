@@ -1,9 +1,8 @@
 {
     "name": "swissdidata/ocrplugin",
-    "description": "OCR — extract text from uploaded PDFs and images using Tesseract, for DiData",
+    "description": "OCR — extract text from uploaded PDFs and images using OpenAI vision, for DiData",
     "require": {
-        "didata/installer": "@dev",
-        "thiagoalessio/tesseract_ocr": "^2.13"
+        "didata/installer": "@dev"
     },
     "autoload": {
         "psr-4": {
