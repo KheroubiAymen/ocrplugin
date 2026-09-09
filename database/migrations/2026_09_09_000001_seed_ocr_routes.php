@@ -1,7 +1,9 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use App\Models\UserRoute;
+use App\Services\ResourceService;
+use App\Services\UserRoutes\UserRouteService;
 
 return new class extends Migration
 {
@@ -52,36 +54,26 @@ PHP,
 
     public function up(): void
     {
-        $now = now();
+        // `migrate` disables permission checks app-wide (App\Listeners\CommandStartingListener),
+        // so UserRouteService's authorize() calls pass here even though nobody is logged in.
         foreach ($this->routes as $routeData) {
-            $existing = DB::table('user_route')->where('name', $routeData['name'])->first();
-            if ($existing) {
-                DB::table('user_route')->where('name', $routeData['name'])->update([
-                    'type'       => $routeData['type'],
-                    'code'       => $routeData['code'],
-                    'is_enabled' => $routeData['is_enabled'] ? 1 : 0,
-                    'sub_path'   => $routeData['sub_path'],
-                    'updated_at' => $now,
-                ]);
-            } else {
-                DB::table('user_route')->insert([
-                    'name'                        => $routeData['name'],
-                    'type'                        => $routeData['type'],
-                    'code'                        => $routeData['code'],
-                    'is_enabled'                  => $routeData['is_enabled'] ? 1 : 0,
-                    'is_public'                   => $routeData['is_public'] ? 1 : 0,
-                    'sub_path'                    => $routeData['sub_path'],
-                    'allow_all_users_access_list' => 1,
-                    'created_at'                  => $now,
-                    'updated_at'                  => $now,
-                ]);
-            }
+            $existing = UserRoute::where('name', $routeData['name'])->first();
+
+            $service = $existing
+                ? app()->make(UserRouteService::class, [
+                    'data'             => $routeData,
+                    'operation'        => ResourceService::UPDATE_OPERATION,
+                    'resourceToUpdate' => $existing,
+                ])
+                : app()->make(UserRouteService::class, ['data' => $routeData]);
+
+            $service->consume();
         }
     }
 
     public function down(): void
     {
         $names = array_column($this->routes, 'name');
-        DB::table('user_route')->whereIn('name', $names)->delete();
+        UserRoute::whereIn('name', $names)->delete();
     }
 };
