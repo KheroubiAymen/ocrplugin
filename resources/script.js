@@ -11,6 +11,23 @@
     };
   },
   methods: {
+    // Same approach as smpl-v2's script.js: getUserRouteURLByName only finds
+    // routes linked to this plugin (plugin_id), which DiData's marketplace
+    // install never sets for a composer-installed package's routes. Our route
+    // is a standalone user route (no plugin_id), so we look it up the way
+    // smpl does — via the general /user-routes list — instead.
+    async getRouteURLByName(name) {
+      if (!this._ocrRouteCache) {
+        const routes = await this.dapp.$axios.$get('/user-routes');
+        this._ocrRouteCache = {};
+        routes.forEach(r => { this._ocrRouteCache[r.name] = r.url; });
+      }
+      const url = this._ocrRouteCache[name];
+      if (!url) {
+        throw new Error('Can not find user route with name: ' + name);
+      }
+      return url;
+    },
     onFileChange(e) {
       const file = e.target.files && e.target.files[0];
       if (file) this.setFile(file);
@@ -36,7 +53,7 @@
         formData.append('file', this.selectedFile);
         formData.append('lang', this.languages || 'eng,fra');
 
-        const url = this.getUserRouteURLByName('ocr_extract_text');
+        const url = await this.getRouteURLByName('ocr_extract_text');
         const response = await this.dapp.$axios.$post(url, formData);
 
         if (response && response.error) {
