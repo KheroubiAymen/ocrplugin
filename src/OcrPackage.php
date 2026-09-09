@@ -12,6 +12,13 @@ class OcrPackage extends PackageInstaller
         $package
             ->hasMigrations()
             ->hasNoConfigFile()
-            ->hasNoTranslations();
+            ->hasNoTranslations()
+            ->hasModulePlugin([
+                'name'      => 'OCR',
+                'meta_data' => ['module_name' => 'ocr'],
+                'icon'      => ['code' => 'document_scanner', 'color' => '#7B61FF'],
+                'template'  => __DIR__.'/../resources/template.xml',
+                'js'        => __DIR__.'/../resources/script.js',
+            ]);
     }
 }

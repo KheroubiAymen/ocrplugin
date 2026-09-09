@@ -1,0 +1,170 @@
+<div class="ocr-container">
+  <h2 class="ocr-title">OCR — Extract text</h2>
+  <p class="ocr-subtitle">Drop a PDF or image, or choose a file, then extract its text with Tesseract.</p>
+
+  <div
+    class="ocr-dropzone"
+    :class="{ 'ocr-dropzone-active': dragActive, 'ocr-dropzone-has-file': selectedFile }"
+    @dragover.prevent="dragActive = true"
+    @dragleave.prevent="dragActive = false"
+    @drop.prevent="onDrop"
+    @click="$refs.ocrFileInput.click()"
+  >
+    <input ref="ocrFileInput" type="file" accept=".pdf,.png,.jpg,.jpeg,.tif,.tiff" style="display:none" @change="onFileChange" />
+    <template v-if="!selectedFile">
+      <div class="ocr-dropzone-icon">📄</div>
+      <div class="ocr-dropzone-text">Drop a file here or click to browse</div>
+      <div class="ocr-dropzone-hint">PDF, PNG, JPG, TIFF</div>
+    </template>
+    <template v-else>
+      <div class="ocr-dropzone-icon">✅</div>
+      <div class="ocr-dropzone-text">{{ selectedFile.name }}</div>
+      <div class="ocr-dropzone-hint">Click to choose a different file</div>
+    </template>
+  </div>
+
+  <div class="ocr-controls">
+    <label class="ocr-lang-label">
+      Languages
+      <input v-model="languages" type="text" class="ocr-lang-input" placeholder="eng,fra" />
+    </label>
+    <button class="ocr-extract-btn" :disabled="!selectedFile || loading" @click="extractText">
+      {{ loading ? 'Extracting…' : 'Extract text' }}
+    </button>
+  </div>
+
+  <div v-if="error" class="ocr-error">{{ error }}</div>
+
+  <div v-if="resultText" class="ocr-result">
+    <div class="ocr-result-header">
+      <span>Extracted text</span>
+      <button class="ocr-copy-btn" @click="copyResult">{{ copied ? 'Copied!' : 'Copy' }}</button>
+    </div>
+    <textarea class="ocr-result-textarea" readonly :value="resultText"></textarea>
+  </div>
+</div>
+
+<style>
+.ocr-container {
+  font-family: 'IBM Plex Sans', Arial, sans-serif;
+  max-width: 640px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+.ocr-title {
+  font-size: 1.6em;
+  font-weight: 700;
+  color: #041E42;
+  margin-bottom: 4px;
+}
+.ocr-subtitle {
+  color: #667085;
+  margin-bottom: 24px;
+}
+.ocr-dropzone {
+  border: 2px dashed #D0D5DD;
+  border-radius: 12px;
+  padding: 48px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+  background: #F9FAFB;
+}
+.ocr-dropzone-active {
+  border-color: #0072CE;
+  background: #EAF5FF;
+}
+.ocr-dropzone-has-file {
+  border-color: #00C389;
+  background: #E6FBF3;
+  border-style: solid;
+}
+.ocr-dropzone-icon {
+  font-size: 2.4em;
+  margin-bottom: 8px;
+}
+.ocr-dropzone-text {
+  font-weight: 600;
+  color: #344054;
+}
+.ocr-dropzone-hint {
+  font-size: 0.85em;
+  color: #98A2B3;
+  margin-top: 4px;
+}
+.ocr-controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+  margin-top: 20px;
+}
+.ocr-lang-label {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85em;
+  color: #475467;
+  font-weight: 600;
+  gap: 4px;
+}
+.ocr-lang-input {
+  border: 1px solid #D0D5DD;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 14px;
+  width: 140px;
+}
+.ocr-extract-btn {
+  background: #0072CE;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-weight: 600;
+  cursor: pointer;
+  height: 38px;
+}
+.ocr-extract-btn:disabled {
+  background: #D0D5DD;
+  cursor: not-allowed;
+}
+.ocr-error {
+  margin-top: 16px;
+  background: #FEF3F2;
+  color: #D92D20;
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 0.9em;
+}
+.ocr-result {
+  margin-top: 24px;
+}
+.ocr-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  color: #041E42;
+  margin-bottom: 8px;
+}
+.ocr-copy-btn {
+  background: #EAF5FF;
+  color: #0072CE;
+  border: none;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.85em;
+  cursor: pointer;
+}
+.ocr-result-textarea {
+  width: 100%;
+  min-height: 260px;
+  border: 1px solid #E4E7EC;
+  border-radius: 8px;
+  padding: 12px;
+  font-family: 'IBM Plex Sans', monospace;
+  font-size: 13px;
+  color: #344054;
+  resize: vertical;
+  box-sizing: border-box;
+}
+</style>

@@ -11,6 +11,8 @@ composer require swissdidata/ocrplugin
 
 The migration seeds a DiData **User Route**: `POST /api/user-routes-call/ocr_extract_text`.
 
+The package also registers an **OCR module** (`resources/template.xml` + `resources/script.js`) — a screen in DiData with a drag-and-drop dropzone, a language field, and the extracted text shown with a copy button. It calls the route above via `this.dapp.$axios.$post(await this.getRouteURLByName('ocr_extract_text'), formData)`.
+
 ## Usage
 
 Send `multipart/form-data`:
